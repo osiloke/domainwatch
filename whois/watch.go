@@ -7,11 +7,12 @@ import (
 	"github.com/likexian/whois-parser-go"
 	dostow "github.com/osiloke/dostow-contrib/store"
 	// "github.com/y0ssar1an/q"
-	"github.com/bradfitz/slice"
-	"gopkg.in/go-playground/pool.v3"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/bradfitz/slice"
+	"gopkg.in/go-playground/pool.v3"
 )
 
 func init() {
@@ -60,6 +61,7 @@ func getWhoisRecord(pos int, row *gabs.Container, store dostow.Dostow) pool.Work
 	}
 }
 
+// Watch a list of domains from a dostow store
 func Watch(apiurl, apikey, name string) error {
 	p := pool.NewLimited(10)
 	store := dostow.NewStore(apiurl, apikey)
@@ -79,7 +81,7 @@ func Watch(apiurl, apikey, name string) error {
 
 	// whois_info := make([]interface{}, total)
 	json, _ := gabs.ParseJSON(r.(dostow.DostowRows).JSON())
-	total := conv.Int64(json.Path("total_count").Data())
+	total, _ := conv.Int64(json.Path("total_count").Data())
 	if total == 0 {
 		log.Println("no domains found")
 		return nil
