@@ -26,28 +26,44 @@ import (
 )
 
 var (
-	url, key, name, schedule string
+	url, key, name, schedule, csv string
 )
 
 // watchCmd represents the watch command
 var watchCmd = &cobra.Command{
 	Use:   "watch",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "watch domains from dostow store",
+	Long:  `watch domains from dostow store`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if schedule != "" {
 			c := cron.New()
-			if err := c.AddFunc(schedule, func() {
-				whois.Watch(url, key, name)
-			}); err != nil {
-				// q.Q(err)
-				log.Fatal(err)
-				return
+			if len(csv) > 0 {
+				result, err := whois.ParseCSV(csv)
+				if err == nil {
+					whois.PrintWhoisResults(result)
+				} else {
+					println(err.Error())
+				}
+				if err := c.AddFunc(schedule, func() {
+					result, err := whois.ParseCSV(csv)
+					if err == nil {
+						whois.PrintWhoisResults(result)
+					} else {
+						println(err.Error())
+					}
+				}); err != nil {
+					// q.Q(err)
+					log.Fatal(err)
+					return
+				}
+			} else {
+				if err := c.AddFunc(schedule, func() {
+					whois.WatchDostow(url, key, name)
+				}); err != nil {
+					// q.Q(err)
+					log.Fatal(err)
+					return
+				}
 			}
 			s := make(chan os.Signal, 1)
 			signal.Notify(s, os.Interrupt)
@@ -61,13 +77,23 @@ to quickly create a Cobra application.`,
 			}
 			println("stopping")
 		} else {
-			whois.Watch(url, key, name)
+			if len(csv) > 0 {
+				res, err := whois.ParseCSV(csv)
+				if err != nil {
+					ifpanic(err)
+					return
+				}
+
+				whois.PrintWhoisResults(res)
+				return
+			}
+			whois.WatchDostow(url, key, name)
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(watchCmd)
+	rootCmd.AddCommand(watchCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -78,9 +104,10 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// watchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	watchCmd.Flags().StringVarP(&url, "url", "u", "", "url")
-	watchCmd.Flags().StringVarP(&key, "key", "k", "", "key")
+	watchCmd.Flags().StringVarP(&url, "url", "u", "", "dostow url")
+	watchCmd.Flags().StringVarP(&key, "key", "k", "", "dostow key")
 	watchCmd.Flags().StringVarP(&name, "name", "n", "domains", "name")
 	watchCmd.Flags().StringVarP(&schedule, "schedule", "s", "", "schedule the watch command at cron time")
+	watchCmd.Flags().StringVarP(&csv, "csv", "c", "", "csv file")
 
 }

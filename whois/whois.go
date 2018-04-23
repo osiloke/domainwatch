@@ -10,5 +10,5 @@ func CheckDomain(domain string) (info whois_parser.WhoisInfo, err error) {
 	if err != nil {
 		return
 	}
-	return whois_parser.Parser(whois_raw)
+	return whois_parser.Parse(whois_raw)
 }

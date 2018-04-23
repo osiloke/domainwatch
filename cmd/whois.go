@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/osiloke/domainwatch/whois"
 	"github.com/spf13/cobra"
 )
@@ -45,7 +46,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	RootCmd.AddCommand(whoisCmd)
+	rootCmd.AddCommand(whoisCmd)
 
 	// Here you will define your flags and configuration settings.
 
