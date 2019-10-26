@@ -2,7 +2,7 @@ package whois
 
 import (
 	"github.com/likexian/whois-go"
-	"github.com/likexian/whois-parser-go"
+	whois_parser "github.com/likexian/whois-parser-go"
 )
 
 func CheckDomain(domain string) (info whois_parser.WhoisInfo, err error) {

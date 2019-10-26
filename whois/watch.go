@@ -4,7 +4,7 @@ import (
 	"github.com/Jeffail/gabs"
 	"github.com/cstockton/go-conv"
 	"github.com/jinzhu/now"
-	"github.com/likexian/whois-parser-go"
+	whois_parser "github.com/likexian/whois-parser-go"
 	dostow "github.com/osiloke/dostow-contrib/store"
 	// "github.com/y0ssar1an/q"
 	"log"
